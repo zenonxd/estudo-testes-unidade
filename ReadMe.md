@@ -23,6 +23,7 @@ Repositorie e Controller).
 Padrão de sempre:
 
 - Repositories: Guarda os métodos para serem criados. Dessa vez usams CrudRepository ao invés de JPA.
+
 ![img_3.png](img_3.png)
 <hr>
 
