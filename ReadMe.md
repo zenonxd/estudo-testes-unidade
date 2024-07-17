@@ -23,14 +23,17 @@ Repositorie e Controller).
 Padrão de sempre:
 
 - Repositories: Guarda os métodos para serem criados. Dessa vez usaremos CrudRepository ao invés de JPA.
+
 ![img_3.png](img_3.png)
 <hr>
 
 - Service: Responsável pela criação, importa o repositorie.
+
 ![img_2.png](img_2.png)
 <hr>
 
 - Controller: Responsável pelo retorno HTTP, importa o service.
+
 ![img_1.png](img_1.png)
 
 A partir do momento que rodarmos o código, as tables irão ser criadas dentro da Database starwars, veja:
