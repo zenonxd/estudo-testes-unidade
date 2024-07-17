@@ -22,7 +22,7 @@ Repositorie e Controller).
 
 Padrão de sempre:
 
-- Repositories: Guarda os métodos para serem criados. Dessa vez usams CrudRepository ao invés de JPA.
+- Repositories: Guarda os métodos para serem criados. Dessa vez usaremos CrudRepository ao invés de JPA.
 ![img_3.png](img_3.png)
 <hr>
 
@@ -89,7 +89,7 @@ Criaremos uma variavel "sut" do tipo Planet, e instanciando-o. **SUT = system un
 
 E por fim, para testarmos e ver se o resultado é o que a gente espera, usamos o AssertJ.
 
-Como é uma comperação de igualdade, importaremos o Apache na classe Planet para verificar a igualdade:
+Como é uma comparação de igualdade, importaremos o Apache na classe Planet para verificar a igualdade:
 ```java
     //clase Planet
     @Override
@@ -100,7 +100,7 @@ Como é uma comperação de igualdade, importaremos o Apache na classe Planet pa
     }
 ```
 
-#### Código: 
+#### Código (ESSE CÓDIGO NO FIM DO ESTUDO MUDA POIS USAREMOS MOCKITO): 
 ```java
 package com.demo.swplanetapi.domain;
 
@@ -110,6 +110,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = PlanetService.class)
+// passando o service.class para que o spring não instancie todos os Beans, somente esse.
+
 public class PlanetServiceTest {
     private PlanetService planetService;
 
@@ -131,19 +133,19 @@ Ao testar, esse código dará um erro. Ele não consegue encontrar uma definiç�
 Isso acontece porque o PlanetService depende de um Repository. Quando testamos e instanciamos o Service, 
 ele também tenta achar o Repository. 
 
-Bom, como testar uma unidade de forma isolada, que possui dependência? Como manter esse teste solitário?
+#### Bom, como testar uma unidade de forma isolada, que possui dependência? Como manter esse teste solitário?
 Usaremos **dublês de teste.**
 <hr>
 
 ## Dublês de Teste
 São usados pelos testes solitários para simular o comportamento das duas dependências. Existem vários
-tipos de dubês, veja:
+tipos de dublês, veja:
 
 1. Dummy (não é muito usado, só quando não queremos criar tudo na mesma hora)
 
 ![img_5.png](img_5.png)
 
-Implementos um DAO (objeto de acesso ao banco de dados) numa classe Dummy. Esse tipo exige a implementação
+Implementamos um DAO (objeto de acesso ao banco de dados) numa classe Dummy. Esse tipo exige a implementação
 de alguns métodos, então colocamos qualquer coisinha. Nesse caso foi o lançamento de uma exception.
 <hr>
 
@@ -207,7 +209,7 @@ Uso do Mockito com dublês de teste:
 
 Aqui testamos um serviço de carro, que retornará os detalhes de um carro de acordo com o nome passado.
 
-O legal é, nesse código o service de carro, depende de um repository e o Mockito consegue mocar esse
+O legal é, nesse código, o service de carro, depende de um repository e o Mockito consegue mocar esse
 repository. E não precisa criar um Stub na mão, e sim usar o when.
 
 ![img_11.png](img_11.png)
@@ -215,3 +217,151 @@ repository. E não precisa criar um Stub na mão, e sim usar o when.
 Ou seja: quando uma operação for chamada (when). Quando isso acontecer, dará o retorno (thenReturn).
 
 Assim que chamarmos o carService, ele usará o when e depois o assert irá verificar a condição.
+<hr>
+
+## Utilizando Mockito
+
+Como nosso Sring não consegue localizar o Repository do nosso service (conforme visto acima), **utilizaremos o
+Mockito para criar esse dublê de teste do planet repository.**
+
+### Como mockar essa dependência?
+Importamos o PlanetRepository e passamos a anotação.
+```java
+@MockBean
+private PlanetRepository planetRepository;
+```
+
+Bom, ao rodarmos nosso código, ele não dará erro. Mas nosso SUT será null. Isso acontece, porque mesmo importando
+o repository, ele continua sendo um Mock. Um Mock não é uma implementação real do componente, não possuem lógica.
+
+Então precisamos definir espectativas claras do que vai ser chamado e retornado. Então aqui usaremos o dublê do tipo
+**Stub**, veja:
+```java
+//antes do sut ser iniciado
+when(planetRepository.save(PLANET)).thenReturn(PLANET);
+```
+
+Ou seja, quando o planetRepository.save for chamado exatamente com aquele planeta específico ele retornará o planeta.
+
+Isso que fizemos segue até um princípio dos testes, chamado AAA.
+```java
+    @Test
+    public void createPlanet_WithValidData_ReturnsPlanet() {
+        //AAA
+
+        //ARRANGE - ARRUMA OS DADOS PRO TESTE
+        when(planetRepository.save(PLANET)).thenReturn(PLANET);
+
+        //ACT - FAZ A OPERAÇÃO DE FATO QUE QUEREMOS TESTAR
+       Planet sut = planetService.create(PLANET);
+
+       //planeta criado pelo service é igual ao que criei agora?
+
+        //ASSERT - AFERE SE O SISTEMA SOB TESTE É O QUE ESPERAMOS.
+       assertThat(sut).isEqualTo(PLANET);
+
+       // como esse metódo ^ trabalha com igualdade, não esquecer de implementar
+        // o equals do apache na classe planet.
+    }
+```
+
+Pequena correção. Quando usamos a anotação do Springboot para iniciar o Service, acaba que ele cria muitos logs só
+para injetar o service. Então a ideia é usarmos o Mockito, criando um teste de unidade puro! Veja como:
+1. Tirar anotação @SpringBootTest e passar @ExtendWith(MockitoExtension.class);
+2. Não injetaremos mais com @AutoWired nem @MockBean, porque não tem mais Spring. Substituiremos por:
+   3. @InjectMocks no service. Essa anotação instancia o service (cria instancia real) e todas as dependências dele
+   já são injetadas pelo Mock.
+   No caso do service, ainda precisamos passar o @Mock (pois precisamos fazer o stub ainda).
+
+Agora o teste será executado muito mais rápido que antes.
+### CÓDIGO FINAL
+```java
+package com.demo.swplanetapi.domain;
+
+import static com.demo.swplanetapi.common.PlanetConstrants.PLANET;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+public class PlanetServiceTest {
+    @InjectMocks
+    private PlanetService planetService;
+    @Mock
+    private PlanetRepository planetRepository;
+    @Test
+    public void createPlanet_WithValidData_ReturnsPlanet() {
+        //AAA
+        //ARRANGE - ARRUMA OS DADOS PRO TESTE
+        when(planetRepository.save(PLANET)).thenReturn(PLANET);
+
+        //ACT - FAZ A OPERAÇÃO DE FATO QUE QUEREMOS TESTAR
+       Planet sut = planetService.create(PLANET);
+
+       //planeta criado pelo service é igual ao que criei agora?
+
+        //ASSERT - AFERE SE O SISTEMA SOB TESTE É O QUE ESPERAMOS.
+       assertThat(sut).isEqualTo(PLANET);
+
+       // como esse metódo ^ trabalha com igualdade, não esquecer de implementar
+        // o equals do apache na classe planet.
+    }
+}
+```
+<hr>
+
+## Trabalhando com Cenários de Erro
+
+Neste estudo específico, sabemos que teremos dois cenários possíveis para erro.
+
+1. Quando não é informado os dados obrigatórios.
+2. Quando tentamos criar um planeta que já existe.
+
+Não seria muito bacana validar esses dados dentro do service com um monte de If. O ideal seria validar na camada de
+Controladores, para quando receber o request ele já retornar o badrequest pro cliente. E por segurança, também colocar
+essa validação no repository (a nivel de banco de dados).
+
+Vamos validar o comportamento do repository (que o service chama), quando passamos dados não integros, veja:
+
+
+**- Quando não é informado os dados obrigatórios.**
+1. Criaremos um método createPlanet_WithInvalidData_ThrowsException;
+2. Criaremos uma variável em PlanetConstraints chamada INVALID_PLANET e todas as suas variáveis serão vazias;
+   3. Essa variável será importada de forma estática.
+4. Quando criamos esse INVALID_PLANET, assim como na função lá de cima, ele vai depender do repository dentro do
+service. E asssim como lá em cima, criaremos um stub, amarrando uma condição e uma resposta associada a ela e
+retornaremos uma exception.
+5. Ao invés de usarmos o AssertThat, usaremos assertThatThrownBy. Ele verifica se uma operação lançou uma exceção.
+<hr>
+
+**- Quando o planeta já existe.**
+
+A ideia seria fazer igual falamos ali em cima. criar as limitações (constraints) no banco de dados, 
+deixaremos ele criar a exceção (se um planeta já existir) e trataremos essa exceção no Controlador.
+
+Mas esse teste que fizemos em cima, já atende essa condição de **planeta já existente**.
+<hr>
+
+## Exercício 1
+
+
+
+
+
+
+
+
+
+
+
+## FIM
+E aqui finalizemos os cenários de erro a nivel de serviço. Mas... não temos a garantia ainda de que o sistema está
+tratando dados invalidos. De fato isso é verdade, a gente precisa testar as camadas que fazem essa validação,
+Controller e Repositories.
+
+ Mas essas camadas possuem integração (controller com web) e (repositorie com banco de dados). Por isso agora,
+ utilizaremos [Testes de Integração]().

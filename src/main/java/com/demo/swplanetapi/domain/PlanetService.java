@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class PlanetService {
 
-    @Autowired
     private PlanetRepository planetRepository;
 
     public Planet create(Planet planet) {
