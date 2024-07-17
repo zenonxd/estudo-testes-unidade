@@ -349,7 +349,130 @@ deixaremos ele criar a exceção (se um planeta já existir) e trataremos essa e
 Mas esse teste que fizemos em cima, já atende essa condição de **planeta já existente**.
 <hr>
 
-## Exercício 1
+## Exercícios
+### Exercício 1 - Testando a consulta de planeta por ID.
+
+![img_12.png](img_12.png)
+
+![DiagramaEx1.png](DiagramaEx1.png)
+
+#### Retornando se existir o ID informado:
+
+[Método do Controller]()
+
+```java
+    @Test
+    public void getPlanet_ByExistingId_ReturnsPlanet() {
+        //PASSAR NO findById o parâmetro a ser testado, retornará o planeta.
+        when(planetRepository.findById(1L)).thenReturn(Optional.of(PLANET));
+
+        Optional<Planet> sut = planetService.get(1L);
+
+        assertThat(sut).isNotEmpty();
+        assertThat(sut.get()).isEqualTo(PLANET);
+    }
+```
+<hr>
+
+#### Retornando se não existir o ID informado:
+```java
+    @Test
+    public void getPlanet_ByUnexistingId_ReturnsPlanet() {
+        //testando uma id inexistente, retornará um optional empty.
+        when(planetRepository.findById(1L)).thenReturn(Optional.empty());
+
+        Optional<Planet> sut = planetService.get(1L);
+
+        assertThat(sut).isEmpty();
+    }
+```
+<hr>
+
+### Exercício 2 - Testando a consulta de planeta por nome.
+
+![img_13.png](img_13.png)
+
+Mesma lógica de cima.
+
+![DiagramaEx2.png](DiagramaEx2.png)
+
+[Método do Controller]()
+
+#### Retornando se o name existir:
+```java
+    @Test
+    public void getPlanet_ByExistingName_ReturnsPlanet() {
+        when(planetRepository.findByName(PLANET.getName())).thenReturn(Optional.of(PLANET));
+
+        Optional<Planet> sut = planetService.getByName(PLANET.getName());
+
+        assertThat(sut).isNotEmpty();
+        assertThat(sut.get()).isEqualTo(PLANET);
+    }
+```
+<hr>
+
+#### Retornando se o name não existir:
+```java
+    @Test
+    public void getPlanet_ByUnexistingName_ReturnsPlanet() {
+        final String name = "Unexisting name";
+        when(planetRepository.findByName(name)).thenReturn(Optional.empty());
+
+        Optional<Planet> sut = planetService.getByName(name);
+
+        assertThat(sut).isEmpty();
+    }
+```
+<hr>
+
+### Exercício 3 - Testando a listagem de planetas.
+
+![img_14.png](img_14.png)
+
+![DiagramaEx3.png](DiagramaEx3.png)
+
+Uma proposta um pouco diferente dos dois exercícios acima.
+<hr>
+
+
+[Método do Controller]()
+
+Aqui teremos uma proposta diferente dos outros métodos. Nosso GET receberá um parâmetro maior (url) e o retorno será
+diferente.
+
+1. Ao invés de ``ResponseEntity<Planet>`` será ``ResponsiveEntity<List<Planet<>``;
+2. Ao invés de passar ``@PathVariable``, passaremos ``@RequestParam``, required falso e o String terrain e climate;
+3. Criaremos uma Lista e atribuiremos a letra o ``planetService.list(terrain, climate)``, passando os dois parâmetros;
+4. Retornaremos o .ok(planets) < lista.
+<hr>
+
+[Método do Service]()
+
+Para tornar essa solução mais versátil no que se diz respeito a pesquisa, usamos Example API. É interessante para
+criarmos querys dinâmicas. Essa query no caso é baseada na entidade Planet, para fazer isso:
+1. Criamos uma classe [QueryBuilder]();
+2. Nela, verificaremos o que a gente informou. O que for nulo, iremos ignorar (como filtro).
+
+Exemplo, se no planet não for informado nem o climate, nem o terrain não teremos filtro nenhum, estará tudo nulo e ele 
+vai buscar todo mundo!
+
+Agora, se informamos um deles, ele considera o valor preenchido e colocará como filtro na query.
+
+Isso é muito válido para não precisar criar um método para cada tipo de filtro e depois fazer "if's" para ver qual chamar.
+
+Voltando para o método Service:
+1. Criamos a query dinâmica;
+2. E fazemos a consulta por todos os planetas que atendem as especificações dessa query.
+<hr>
+
+[Método do Repository]()
+
+No repository, precisamos criar esse findAll do Service. Para usar esse findAll precisa expor através de outra interface
+(QueryByExampleExecutor<Planet>).
+
+Essa interface permite criar consultas com o objeto example, que cria uma query dinâmica. Assim que implementar, ele vai
+para o findAll e vai conseguir implementar a lógica.
 
 
 
@@ -359,8 +482,7 @@ Mas esse teste que fizemos em cima, já atende essa condição de **planeta já 
 
 
 
-
-
+<hr>
 ## FIM
 E aqui finalizemos os cenários de erro a nivel de serviço. Mas... não temos a garantia ainda de que o sistema está
 tratando dados invalidos. De fato isso é verdade, a gente precisa testar as camadas que fazem essa validação,
