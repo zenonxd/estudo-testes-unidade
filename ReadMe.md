@@ -529,7 +529,7 @@ diferente.
 
 ### Na classe de teste 👇
 
-[Retornando Lista de Planetas]()
+[Retornando Lista de Planetas](https://github.com/zenonxd/estudo-testes-integracao/blob/452bbf8c71d25d54b0610229e6c4c28bd811ded4/src/test/java/com/demo/swplanetapi/domain/PlanetServiceTest.java#L95)
 -
 ```java
     @Test
@@ -554,7 +554,7 @@ diferente.
 ```
 <hr>
 
-[Retornando Nenhum Planeta]()
+[Retornando Nenhum Planeta](https://github.com/zenonxd/estudo-testes-integracao/blob/452bbf8c71d25d54b0610229e6c4c28bd811ded4/src/test/java/com/demo/swplanetapi/domain/PlanetServiceTest.java#L114)
 -
 ```java
     @Test
@@ -587,14 +587,14 @@ Vamos remover um planeta baseado na sua ID.
 
 Método do Repository
 -
-Não será implementado nada pois o deleteById já é existente nele.
+Não será implementado nada, pois o deleteById já é existente nele.
 
 
-[Método do Service]()
+[Método do Service](https://github.com/zenonxd/estudo-testes-integracao/blob/452bbf8c71d25d54b0610229e6c4c28bd811ded4/src/main/java/com/demo/swplanetapi/domain/PlanetService.java#L35)
 -
 Uma função void somente deletando o planeta pelo ID.
 
-[Método do Controller]()
+[Método do Controller](https://github.com/zenonxd/estudo-testes-integracao/blob/452bbf8c71d25d54b0610229e6c4c28bd811ded4/src/main/java/com/demo/swplanetapi/web/PlanetController.java#L44)
 -
 Uma função void onde irá remover o id através do service e depois retornar o ResponsiveEntity com noContent e build.
 
@@ -608,7 +608,7 @@ que retorna algo. Ele precisa retornar um void dessa vez.
 
 Então usamos o assertThatCode e doThrow (informando primeiro qual exceção será lançada e depois a condição.
 
-[Removendo Planeta com ID Existente]()
+[Removendo Planeta com ID Existente](https://github.com/zenonxd/estudo-testes-integracao/blob/452bbf8c71d25d54b0610229e6c4c28bd811ded4/src/test/java/com/demo/swplanetapi/domain/PlanetServiceTest.java#L127)
 -
 ```java
     @Test
@@ -619,7 +619,7 @@ Então usamos o assertThatCode e doThrow (informando primeiro qual exceção ser
 ```
 <hr>
 
-[Removendo Planeta com ID não Existente + Exceção]()
+[Removendo Planeta com ID não Existente + Exceção](https://github.com/zenonxd/estudo-testes-integracao/blob/452bbf8c71d25d54b0610229e6c4c28bd811ded4/src/test/java/com/demo/swplanetapi/domain/PlanetServiceTest.java#L132)
 -
 ```java
     @Test
@@ -642,7 +642,8 @@ Então usamos o assertThatCode e doThrow (informando primeiro qual exceção ser
 1. Sempre definir cenários de teste, imaginando os possíveis comportamentos da aplicação;
 2. Quando formos realizar o teste, sempre espelhar as camadas. Ou seja, o pacote de test, também terá domain,
 web, controller, etc;
-3. Para não instanciar toda hora, um objeto, criamos uma [Constrant](), onde terá o objeto instanciado com os parâmetros
+3. Para não instanciar toda hora, um objeto, criamos uma [Constrant](https://github.com/zenonxd/estudo-testes-integracao/blob/main/src/test/java/com/demo/swplanetapi/common/PlanetConstrants.java), 
+onde terá o objeto instanciado com os parâmetros
 desejados. Ela será importada para a classe de teste de forma estática;
 4. Dentro de quase todo método de teste, será criada essa constraint com o nome SUT, para instanciar os objetos;
 5. Na classe do Domain, ter o método equals implementado, pois o assertJ fará comparação de igualdade;
@@ -666,9 +667,9 @@ se retornará ou não uma exception.
 <hr>
 
 ## Fim
-E aqui finalizemos os cenários de erro a nivel de serviço. Mas... não temos a garantia ainda de que o sistema está
+E aqui finalizamos os cenários de erro a nivel de serviço. Mas... não temos a garantia ainda de que o sistema está
 tratando dados invalidos. De fato isso é verdade, a gente precisa testar as camadas que fazem essa validação,
 Controller e Repositories.
 
 Mas essas camadas possuem integração (controller com web) e (repositorie com banco de dados). Por isso agora,
-utilizaremos [Testes de Integração]().
+utilizaremos [Testes de Integração](https://github.com/zenonxd/estudo-testes-integracao).
