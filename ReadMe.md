@@ -1,5 +1,33 @@
 # Estudo Testes de Unidade
 
+## Referência: Testes automatizados na prática com Spring Boot
+[Compre aqui](https://www.udemy.com/course/testes-automatizados-na-pratica-com-spring-boot/)
+<hr>
+
+## Dica para leitura:
+Durante o estudo, os códigos mudam pois geralmente é ensinado algo básico onde depois iremos implementar o que de fato
+é utilizado no mercado de trabalho. Tome cuidado ao considerar códigos do início do estudo, se atente ao código final.
+
+## Tópicos
+- [Proposta do Curso - Criando API Planetas](#criando-api-de-planetas)
+- [Como saber se a API está funcionando? Cenários de Teste](#cenários-de-teste)
+- [Cadastro de Usuário (espelhamento de pacotes)](#cadastro-de-um-usuário-com-sucesso)
+- [Dublês de Teste](#dublês-de-teste)
+  - [Dummy](#dummy-não-é-muito-usado-só-quando-não-queremos-criar-tudo-na-mesma-hora)
+  - [Fake](#fake---para-banco-de-dados-em-memória-)
+  - [Stub](#stub---cenário-mais-comum)
+  - [Spy](#spy---um-stub-mais-robusto)
+  - [Mock](#mock---geralmente-o-mais-utilizado)
+- [Utilizando Mockito](#utilizando-mockito)
+- [Trabalhando com Cenários de Erro](#trabalhando-com-cenários-de-erro)
+- [Exercícios sobre Testes de Unidade](#exercícios)
+  - [Exercício 1 - Consulta por ID](#exercício-1---testando-a-consulta-de-planeta-por-id)
+  - [Exercício 2 - Consulta por Nome](#exercício-2---testando-a-consulta-de-planeta-por-nome)
+  - [Exercício 3 - Consulta por Listagem](#exercício-3---testando-a-listagem-de-planetas)
+  - [Exercício 4 - Testando a Remoçãod de Planetas por ID](#exercício-4---testando-a-remoção-de-planetas)
+- [Resumo Sobre o Estudo](#resumo)
+<hr>
+
 ![img.png](img.png)
 
 Como vimos no estudo de introdução, testes de unidade seria para métodos ou classes, por exemplo.
@@ -144,7 +172,7 @@ Usaremos **dublês de teste.**
 São usados pelos testes solitários para simular o comportamento das duas dependências. Existem vários
 tipos de dublês, veja:
 
-1. Dummy (não é muito usado, só quando não queremos criar tudo na mesma hora)
+### Dummy (não é muito usado, só quando não queremos criar tudo na mesma hora)
 
 ![img_5.png](img_5.png)
 
@@ -152,7 +180,7 @@ Implementamos um DAO (objeto de acesso ao banco de dados) numa classe Dummy. Ess
 de alguns métodos, então colocamos qualquer coisinha. Nesse caso foi o lançamento de uma exception.
 <hr>
 
-2. Fake - Para banco de dados em memória. 
+### Fake - Para banco de dados em memória. 
 
 Implementação fake de um banco Oracle, por exemplo.
 
@@ -162,7 +190,7 @@ Nesse caso, usamos um Repository (ou um banco de dados) em lista (memória mesmo
 fazer o teste.
 <hr>
 
-3. Stub - Cenário mais Comum
+### Stub - Cenário mais Comum
 
 A ideia dele é responder com definição pré estabelecida.
 
@@ -176,7 +204,7 @@ Assim, é possível testar o service. Foi atribuito ao service a classe listSub 
 E depois checamos o estado.
 <hr>
 
-4. Spy - Um stub mais robusto
+### Spy - Um stub mais robusto
 
 Se comporta igual ao stub (fazendo implementação fitícia), mas além de definir o que será retornado,
 o Spy coleta informação de como esses objetos do método foram invocados.
@@ -189,7 +217,7 @@ o comportamento que ocorreu quando chamamos o alvo de teste.
 O estado da lista muda!
 <hr>
 
-5. Mock - Geralmente o mais utilizado
+### Mock - Geralmente o mais utilizado
 
 Sua ideia é verificar o comportamento. Descreve a interação com a dependência, para ver se o fluxo
 que a gente deseja foi invocado.
@@ -356,10 +384,21 @@ Mas esse teste que fizemos em cima, já atende essa condição de **planeta já 
 
 ![DiagramaEx1.png](DiagramaEx1.png)
 
-#### Retornando se existir o ID informado:
 
-[Método do Controller]()
+[Método do Service](https://github.com/zenonxd/estudo-testes-unidade/blob/6529420adaf9a44df0feac882fe9fa7769aad4ad/src/main/java/com/demo/swplanetapi/domain/PlanetService.java#L22)
+-
+No método, fazer o retorno entrando no repository e usar findById.
 
+[Método do Controller](https://github.com/zenonxd/estudo-testes-unidade/blob/6529420adaf9a44df0feac882fe9fa7769aad4ad/src/main/java/com/demo/swplanetapi/web/PlanetController.java#L25)
+-
+1. Passar o parâmetro no @GetMapping. 
+2. Acessar o planetService e seu método getById;
+3. Usar o .map parar dar o ".ok()" passando o planet ou ".notFound()".
+
+### Na classe de teste 👇
+
+[Retornando se existir o ID informado](https://github.com/zenonxd/estudo-testes-unidade/blob/6529420adaf9a44df0feac882fe9fa7769aad4ad/src/test/java/com/demo/swplanetapi/domain/PlanetServiceTest.java#L50)
+-
 ```java
     @Test
     public void getPlanet_ByExistingId_ReturnsPlanet() {
@@ -374,7 +413,8 @@ Mas esse teste que fizemos em cima, já atende essa condição de **planeta já 
 ```
 <hr>
 
-#### Retornando se não existir o ID informado:
+[Retornando se não existir o ID informado](https://github.com/zenonxd/estudo-testes-unidade/blob/6529420adaf9a44df0feac882fe9fa7769aad4ad/src/test/java/com/demo/swplanetapi/domain/PlanetServiceTest.java#L61)
+-
 ```java
     @Test
     public void getPlanet_ByUnexistingId_ReturnsPlanet() {
@@ -396,9 +436,21 @@ Mesma lógica de cima.
 
 ![DiagramaEx2.png](DiagramaEx2.png)
 
-[Método do Controller]()
+[Método do Service](https://github.com/zenonxd/estudo-testes-unidade/blob/6529420adaf9a44df0feac882fe9fa7769aad4ad/src/main/java/com/demo/swplanetapi/domain/PlanetService.java#L26)
+-
+Bem padrão usar o método findByName criado no repository.
 
-#### Retornando se o name existir:
+[Método do Controller](https://github.com/zenonxd/estudo-testes-unidade/blob/6529420adaf9a44df0feac882fe9fa7769aad4ad/src/main/java/com/demo/swplanetapi/web/PlanetController.java#L31)
+-
+
+1. Passar o parâmetro no @GetMapping. 
+2. Acessar o planetService e seu método getByName;
+3. Usar o .map parar dar o ".ok()" passando o planet ou ".notFound()".
+
+### Na classe de teste 👇
+
+[Retornando se o name existir](https://github.com/zenonxd/estudo-testes-unidade/blob/6529420adaf9a44df0feac882fe9fa7769aad4ad/src/test/java/com/demo/swplanetapi/domain/PlanetServiceTest.java#L70)
+-
 ```java
     @Test
     public void getPlanet_ByExistingName_ReturnsPlanet() {
@@ -412,7 +464,8 @@ Mesma lógica de cima.
 ```
 <hr>
 
-#### Retornando se o name não existir:
+[Retornando se o name não existir](https://github.com/zenonxd/estudo-testes-unidade/blob/6529420adaf9a44df0feac882fe9fa7769aad4ad/src/test/java/com/demo/swplanetapi/domain/PlanetServiceTest.java#L80)
+-
 ```java
     @Test
     public void getPlanet_ByUnexistingName_ReturnsPlanet() {
@@ -433,28 +486,23 @@ Mesma lógica de cima.
 ![DiagramaEx3.png](DiagramaEx3.png)
 
 Uma proposta um pouco diferente dos dois exercícios acima.
-<hr>
 
+[Método do Repository](https://github.com/zenonxd/estudo-testes-unidade/blob/6529420adaf9a44df0feac882fe9fa7769aad4ad/src/main/java/com/demo/swplanetapi/domain/PlanetRepository.java#L14)
+-
+No repository, precisamos criar esse findAll do Service. Para usar esse findAll precisa expor através de outra interface
+(QueryByExampleExecutor<Planet>).
 
-[Método do Controller]()
+Essa interface permite criar consultas com o objeto example, que cria uma query dinâmica. Assim que implementar, ele vai
+para o findAll e vai conseguir implementar a lógica.
 
-Aqui teremos uma proposta diferente dos outros métodos. Nosso GET receberá um parâmetro maior (url) e o retorno será
-diferente.
-
-1. Ao invés de ``ResponseEntity<Planet>`` será ``ResponsiveEntity<List<Planet<>``;
-2. Ao invés de passar ``@PathVariable``, passaremos ``@RequestParam``, required falso e o String terrain e climate;
-3. Criaremos uma Lista e atribuiremos a letra o ``planetService.list(terrain, climate)``, passando os dois parâmetros;
-4. Retornaremos o .ok(planets) < lista.
-<hr>
-
-[Método do Service]()
-
+[Método do Service](https://github.com/zenonxd/estudo-testes-unidade/blob/6529420adaf9a44df0feac882fe9fa7769aad4ad/src/main/java/com/demo/swplanetapi/domain/PlanetService.java#L30)
+-
 Para tornar essa solução mais versátil no que se diz respeito a pesquisa, usamos Example API. É interessante para
 criarmos querys dinâmicas. Essa query no caso é baseada na entidade Planet, para fazer isso:
-1. Criamos uma classe [QueryBuilder]();
+1. Criamos uma classe [QueryBuilder](https://github.com/zenonxd/estudo-testes-unidade/blob/main/src/main/java/com/demo/swplanetapi/domain/QueryBuilder.java);
 2. Nela, verificaremos o que a gente informou. O que for nulo, iremos ignorar (como filtro).
 
-Exemplo, se no planet não for informado nem o climate, nem o terrain não teremos filtro nenhum, estará tudo nulo e ele 
+Exemplo, se no planet não for informado nem o climate, nem o terrain não teremos filtro nenhum, estará tudo nulo e ele
 vai buscar todo mundo!
 
 Agora, se informamos um deles, ele considera o valor preenchido e colocará como filtro na query.
@@ -464,29 +512,163 @@ Isso é muito válido para não precisar criar um método para cada tipo de filt
 Voltando para o método Service:
 1. Criamos a query dinâmica;
 2. E fazemos a consulta por todos os planetas que atendem as especificações dessa query.
+
+
+[Método do Controller](https://github.com/zenonxd/estudo-testes-unidade/blob/6529420adaf9a44df0feac882fe9fa7769aad4ad/src/main/java/com/demo/swplanetapi/web/PlanetController.java#L37)
+-
+
+Aqui teremos uma proposta diferente dos outros métodos. Nosso GET receberá um parâmetro maior (url) e o retorno será
+diferente.
+
+1. Ao invés de ``ResponseEntity<Planet>`` será ``ResponsiveEntity<List<Planet<>``;
+2. Ao invés de passar ``@PathVariable``, passaremos ``@RequestParam``, required falso e o String terrain e climate;
+3. Criaremos uma Lista e atribuiremos a letra o ``planetService.list(terrain, climate)``, passando os dois parâmetros;
+
+   - lembrar que esse .list é o metodo que recebe a query e instancia o new Planet.
+4. Retornaremos o .ok(planets) < lista.
+
+### Na classe de teste 👇
+
+[Retornando Lista de Planetas]()
+-
+```java
+    @Test
+    public void listPlanets_ReturnsAllPlanets() {
+        List<Planet> planets = new ArrayList<>(){{
+            add(PLANET);
+        }};
+
+        //query selicionada, nesse caso usaremos os dois parâmetros
+        Example<Planet> query = QueryBuilder.makeQuery(new Planet(PLANET.getClimate(), PLANET.getTerrain()));
+
+        //quando o repositorio chamar o findAll com essa query, ele irá
+        // retornar a lista
+        when(planetRepository.findAll(query)).thenReturn(planets);
+
+        List<Planet> sut = planetService.list(PLANET.getTerrain(), PLANET.getClimate());
+
+        assertThat(sut).isNotEmpty();
+        assertThat(sut).hasSize(1);
+        assertThat(sut.get(0)).isEqualTo(PLANET);
+    }
+```
 <hr>
 
-[Método do Repository]()
+[Retornando Nenhum Planeta]()
+-
+```java
+    @Test
+    public void listPlanets_ReturnsNoPlanets() {
 
-No repository, precisamos criar esse findAll do Service. Para usar esse findAll precisa expor através de outra interface
-(QueryByExampleExecutor<Planet>).
+        //importando esse any() estático para não ser preciso iniciar uma query
+        when(planetRepository.findAll(any())).thenReturn(Collections.emptyList());
 
-Essa interface permite criar consultas com o objeto example, que cria uma query dinâmica. Assim que implementar, ele vai
-para o findAll e vai conseguir implementar a lógica.
+        //quando iniciamos esse service, ele vai se encaixar na condição do any 
+        // acima pois ele vai aceitar qualquer parametro para retornar a coleção 
+        // vazia
+        List<Planet> sut = planetService.list(PLANET.getTerrain(), PLANET.getClimate());
 
-
-
-
-
-
-
+        assertThat(sut).isEmpty();
+    }
+```
 
 
 <hr>
-## FIM
+
+### Exercício 4 - Testando a remoção de planetas.
+
+Vamos remover um planeta baseado na sua ID.
+
+![img_15.png](img_15.png)
+
+![DiagramaEx4.png](DiagramaEx4.png)
+
+
+
+Método do Repository
+-
+Não será implementado nada pois o deleteById já é existente nele.
+
+
+[Método do Service]()
+-
+Uma função void somente deletando o planeta pelo ID.
+
+[Método do Controller]()
+-
+Uma função void onde irá remover o id através do service e depois retornar o ResponsiveEntity com noContent e build.
+
+### Na classe de teste 👇
+
+Como os métodos nas classes acima são void (não retornam nada), os nossos métodos de teste precisam somente verificar
+se alguma exceção foi lançada.
+
+A única diferença é que não podemos usar o ``when`` primeiro dessa vez. Quando usamos o when, ele recebe um repository
+que retorna algo. Ele precisa retornar um void dessa vez.
+
+Então usamos o assertThatCode e doThrow (informando primeiro qual exceção será lançada e depois a condição.
+
+[Removendo Planeta com ID Existente]()
+-
+```java
+    @Test
+    public void removePlanet_WithExistingId_doestNotThrowAnyException() {
+        //faz o assert de que essa função (.remove), não lançará nenhuma exceção.
+        assertThatCode(() -> planetService.remove(1L)).doesNotThrowAnyException();
+    }
+```
+<hr>
+
+[Removendo Planeta com ID não Existente + Exceção]()
+-
+```java
+    @Test
+    public void removePlanet_WithInvalidId_ThrowsException() {
+        //passando do throw, especificando a exceção primeiro e depois a condição,
+        //pois estamos trabalhando com retorno void.
+        doThrow(new RuntimeException()).when(planetRepository).deleteById(99L);
+
+        //aqui verificamos se, ao passar o remove, usando a mesma ID de cima, é
+        //lançada uma exceção de RunTimeException.
+        assertThatThrownBy(() -> planetService.remove(99L)).isInstanceOf(RuntimeException.class);
+    }
+```
+
+<hr>
+
+## RESUMO
+
+### TEORIA
+1. Sempre definir cenários de teste, imaginando os possíveis comportamentos da aplicação;
+2. Quando formos realizar o teste, sempre espelhar as camadas. Ou seja, o pacote de test, também terá domain,
+web, controller, etc;
+3. Para não instanciar toda hora, um objeto, criamos uma [Constrant](), onde terá o objeto instanciado com os parâmetros
+desejados. Ela será importada para a classe de teste de forma estática;
+4. Dentro de quase todo método de teste, será criada essa constraint com o nome SUT, para instanciar os objetos;
+5. Na classe do Domain, ter o método equals implementado, pois o assertJ fará comparação de igualdade;
+6. Lembrar de [tipos de dublês de teste](#dublês-de-teste);
+7. [Mockar as dependências](#como-mockar-essa-dependência);
+<HR>
+
+### PRATICA
+1. Lembrar sempre: O que iremos testar, precisa mexer algo no repository?
+2. Depois, implementar o método no service. Nele, faremos as regras de negócio, utilizando métodos do repository;
+3. No Controller, realizar as requisições.
+4. Na classe de teste, lembrar do AAA;
+    - Arrange - Arrumar os dados para teste;
+      - (o when do mockito).
+    - Act - Fazer a operação de fato que queremos testar;
+      - instanciação do sut/constraint.
+    - Assert - Afere se o sistema sob teste é o que esperamos.
+      - comparação com o AssertJ.
+5. Caso nosso método de teste tenha retorno void, o desenvolvimento de código será mais enxuto, verificando somente
+se retornará ou não uma exception.
+<hr>
+
+## Fim
 E aqui finalizemos os cenários de erro a nivel de serviço. Mas... não temos a garantia ainda de que o sistema está
 tratando dados invalidos. De fato isso é verdade, a gente precisa testar as camadas que fazem essa validação,
 Controller e Repositories.
 
- Mas essas camadas possuem integração (controller com web) e (repositorie com banco de dados). Por isso agora,
- utilizaremos [Testes de Integração]().
+Mas essas camadas possuem integração (controller com web) e (repositorie com banco de dados). Por isso agora,
+utilizaremos [Testes de Integração]().
