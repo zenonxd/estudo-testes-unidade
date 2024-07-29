@@ -1,3 +1,16 @@
+<h1 align="center">
+  StarWars Planet API (sw-planet-api)
+</h1>
+
+<p align="center">
+  <a href="#-technologies">Tecnologias</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#-introdução">Introdução</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/static/v1?label=Curso na Udemy&message=Testes automatizados na prática com Spring Boot&color=8257E5&labelColor=000000" alt="Testes automatizados na prática com Spring Boot" />
+</p>
+
 # Estudo Testes de Unidade
 
 ## Referência: Testes automatizados na prática com Spring Boot
@@ -8,25 +21,96 @@
 Durante o estudo, os códigos mudam pois geralmente é ensinado algo básico onde depois iremos implementar o que de fato
 é utilizado no mercado de trabalho. Tome cuidado ao considerar códigos do início do estudo, se atente ao código final.
 
-## Tópicos
-- [Proposta do Curso - Criando API Planetas](#criando-api-de-planetas)
-- [Como saber se a API está funcionando? Cenários de Teste](#cenários-de-teste)
-- [Cadastro de Usuário (espelhamento de pacotes)](#cadastro-de-um-usuário-com-sucesso)
-- [Dublês de Teste](#dublês-de-teste)
-  - [Dummy](#dummy-não-é-muito-usado-só-quando-não-queremos-criar-tudo-na-mesma-hora)
-  - [Fake](#fake---para-banco-de-dados-em-memória-)
-  - [Stub](#stub---cenário-mais-comum)
-  - [Spy](#spy---um-stub-mais-robusto)
-  - [Mock](#mock---geralmente-o-mais-utilizado)
-- [Utilizando Mockito](#utilizando-mockito)
-- [Trabalhando com Cenários de Erro](#trabalhando-com-cenários-de-erro)
-- [Exercícios sobre Testes de Unidade](#exercícios)
-  - [Exercício 1 - Consulta por ID](#exercício-1---testando-a-consulta-de-planeta-por-id)
-  - [Exercício 2 - Consulta por Nome](#exercício-2---testando-a-consulta-de-planeta-por-nome)
-  - [Exercício 3 - Consulta por Listagem](#exercício-3---testando-a-listagem-de-planetas)
-  - [Exercício 4 - Testando a Remoçãod de Planetas por ID](#exercício-4---testando-a-remoção-de-planetas)
-- [Resumo Sobre o Estudo](#resumo)
+## ✨ Technologies
+
+- [Mysql](https://dev.mysql.com/downloads/mysql/)
+- [Java](https://www.oracle.com/java/technologies/downloads/)
+- [Maven](https://maven.apache.org/download.cgi)
+- [Spring Boot](https://spring.io/projects/spring-boot)
+- [Spring Testing](https://docs.spring.io/spring-framework/docs/current/reference/html/testing.html#testing-introduction)
+- [JUnit 5](https://junit.org/junit5/docs/current/user-guide/)
+- [Mockito](https://site.mockito.org)
+- [AssertJ](https://github.com/assertj/assertj)
+- [Hamcrest](http://hamcrest.org/JavaHamcrest/)
+- [Jacoco](https://github.com/jacoco/jacoco)
+- [Pitest](https://pitest.org)
+
+## 📌 Tópicos
+
+* [Estudo Testes de Unidade](#estudo-testes-de-unidade)
+  * [Referência: Testes automatizados na prática com Spring Boot](#referência-testes-automatizados-na-prática-com-spring-boot)
+  * [Dica para leitura:](#dica-para-leitura)
+  * [✨ Technologies](#-technologies)
+  * [📌 Tópicos](#-tópicos)
+* [💻 Introdução](#-introdução)
+  * [🌎 Criando API de Planetas](#-criando-api-de-planetas)
+  * [🛠️ Cenários de Teste](#-cenários-de-teste)
 <hr>
+
+  * [🛠️ Cadastro de um usuário com sucesso](#-cadastro-de-um-usuário-com-sucesso)
+    * [Começaremos pela unidade que representa as regras de negocio, o **service**.](#começaremos-pela-unidade-que-representa-as-regras-de-negocio-o-service)
+      * [Código (ESSE CÓDIGO NO FIM DO ESTUDO MUDA POIS USAREMOS MOCKITO):](#código-esse-código-no-fim-do-estudo-muda-pois-usaremos-mockito-)
+      * [Bom, como testar uma unidade de forma isolada, que possui dependência? Como manter esse teste solitário?](#bom-como-testar-uma-unidade-de-forma-isolada-que-possui-dependência-como-manter-esse-teste-solitário)
+<hr>
+
+  * [🥷 Dublês de Teste](#-dublês-de-teste)
+    * [Dummy (não é muito usado, só quando não queremos criar tudo na mesma hora)](#dummy-não-é-muito-usado-só-quando-não-queremos-criar-tudo-na-mesma-hora)
+    * [Fake - Para banco de dados em memória.](#fake---para-banco-de-dados-em-memória-)
+    * [Stub - Cenário mais Comum](#stub---cenário-mais-comum)
+    * [Spy - Um stub mais robusto](#spy---um-stub-mais-robusto)
+    * [Mock - Geralmente o mais utilizado](#mock---geralmente-o-mais-utilizado)
+<hr>
+
+  * [Utilizando Mockito](#utilizando-mockito)
+    * [Como mockar essa dependência?](#como-mockar-essa-dependência)
+    * [CÓDIGO FINAL](#código-final)
+<hr>
+
+  * [❌ Trabalhando com Cenários de Erro](#-trabalhando-com-cenários-de-erro)
+  * [✅ Exercícios](#-exercícios)
+<hr>
+
+* [Exercício 1 - Testando a consulta de planeta por ID.](#exercício-1---testando-a-consulta-de-planeta-por-id)
+  * [Método do Service](#método-do-service)
+  * [Método do Controller](#método-do-controller)
+    * [Na classe de teste 👇](#na-classe-de-teste-)
+  * [Retornando se existir o ID informado](#retornando-se-existir-o-id-informado)
+  * [Retornando se não existir o ID informado](#retornando-se-não-existir-o-id-informado)
+<hr>
+
+* [Exercício 2 - Testando a consulta de planeta por nome.](#exercício-2---testando-a-consulta-de-planeta-por-nome)
+  * [Método do Service](#método-do-service-1)
+  * [Método do Controller](#método-do-controller-1)
+    * [Na classe de teste 👇](#na-classe-de-teste--1)
+  * [Retornando se o name existir](#retornando-se-o-name-existir)
+  * [Retornando se o name não existir](#retornando-se-o-name-não-existir)
+<hr>
+
+* [Exercício 3 - Testando a listagem de planetas.](#exercício-3---testando-a-listagem-de-planetas)
+  * [Método do Repository](#método-do-repository)
+  * [Método do Service](#método-do-service-2)
+  * [Método do Controller](#método-do-controller-2)
+    * [Na classe de teste 👇](#na-classe-de-teste--2)
+  * [Retornando Lista de Planetas](#retornando-lista-de-planetas)
+  * [Retornando Nenhum Planeta](#retornando-nenhum-planeta)
+<hr>
+
+* [Exercício 4 - Testando a remoção de planetas.](#exercício-4---testando-a-remoção-de-planetas)
+  * [Método do Repository](#método-do-repository-1)
+  * [Método do Service](#método-do-service-3)
+  * [Método do Controller](#método-do-controller-3)
+    * [Na classe de teste 👇](#na-classe-de-teste--3)
+  * [Removendo Planeta com ID Existente](#removendo-planeta-com-id-existente)
+  * [Removendo Planeta com ID não Existente + Exceção](#removendo-planeta-com-id-não-existente--exceção)
+<hr>
+
+* [RESUMO](#resumo)
+  * [📚 TEORIA](#-teoria)
+  * [🛠️ PRATICA](#-pratica)
+
+<hr>
+
+# 💻 Introdução
 
 ![img.png](img.png)
 
@@ -43,7 +127,7 @@ estamos falando de banco de dados ou outros métodos externos.
 alguma dependência no teste.
 <hr>
 
-## Criando API de Planetas
+## 🌎 Criando API de Planetas
 
 Aqui, criaremos um projeto spring padrão, e faremos a criação dos pacotes e classes. (Service,
 Repositorie e Controller).
@@ -72,7 +156,7 @@ Para realizar um post dentro do powershell:
 >curl.exe --% -ku user:passwd http://localhost:8080/planets  -H "Content-Type: application/json" -d "{\"name\":\"name\", \"climate\":\"climate\",\"terrain\":\"terrain\"}" -v
 <hr>
 
-## Cenários de Teste
+## 🛠️ Cenários de Teste
 Como saber que a nossa aplicação funciona? Bom, primeiro precisamos definir quais comportamentos ela terá
 em determinadas situações.
 
@@ -81,7 +165,7 @@ Uma boa é a gente definir os possíveis cenários, veja no diagrama:
 ![Cenarios+de+Teste+-+Cadastro+de+Planeta.png](Cenarios+de+Teste+-+Cadastro+de+Planeta.png)
 <hr>
 
-## Cadastro de um usuário com sucesso
+## 🛠️ Cadastro de um usuário com sucesso
 
 Primeiro. Vamos espelhar os nossos pacotes. Tudo que está dentro da API, vai para pasta de testes.
 
@@ -168,7 +252,7 @@ ele também tenta achar o Repository.
 Usaremos **dublês de teste.**
 <hr>
 
-## Dublês de Teste
+## 🥷 Dublês de Teste
 São usados pelos testes solitários para simular o comportamento das duas dependências. Existem vários
 tipos de dublês, veja:
 
@@ -345,7 +429,7 @@ public class PlanetServiceTest {
 ```
 <hr>
 
-## Trabalhando com Cenários de Erro
+## ❌ Trabalhando com Cenários de Erro
 
 Neste estudo específico, sabemos que teremos dois cenários possíveis para erro.
 
@@ -377,7 +461,8 @@ deixaremos ele criar a exceção (se um planeta já existir) e trataremos essa e
 Mas esse teste que fizemos em cima, já atende essa condição de **planeta já existente**.
 <hr>
 
-## Exercícios
+## ✅ Exercícios
+
 ### Exercício 1 - Testando a consulta de planeta por ID.
 
 ![img_12.png](img_12.png)
@@ -638,7 +723,7 @@ Então usamos o assertThatCode e doThrow (informando primeiro qual exceção ser
 
 ## RESUMO
 
-### TEORIA
+### 📚 TEORIA
 1. Sempre definir cenários de teste, imaginando os possíveis comportamentos da aplicação;
 2. Quando formos realizar o teste, sempre espelhar as camadas. Ou seja, o pacote de test, também terá domain,
 web, controller, etc;
@@ -651,7 +736,7 @@ desejados. Ela será importada para a classe de teste de forma estática;
 7. [Mockar as dependências](#como-mockar-essa-dependência);
 <HR>
 
-### PRATICA
+### 🛠️ PRATICA
 1. Lembrar sempre: O que iremos testar, precisa mexer algo no repository?
 2. Depois, implementar o método no service. Nele, faremos as regras de negócio, utilizando métodos do repository;
 3. No Controller, realizar as requisições.
@@ -666,7 +751,7 @@ desejados. Ela será importada para a classe de teste de forma estática;
 se retornará ou não uma exception.
 <hr>
 
-## Fim
+
 E aqui finalizamos os cenários de erro a nivel de serviço. Mas... não temos a garantia ainda de que o sistema está
 tratando dados invalidos. De fato isso é verdade, a gente precisa testar as camadas que fazem essa validação,
 Controller e Repositories.
